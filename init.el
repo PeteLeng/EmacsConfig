@@ -6,8 +6,22 @@
 (require 'package)
 
 ;; Add the Melpa archive to the list of available repositories
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.org/packages/") t)
+;; (add-to-list 'package-archives
+;;              '("melpa" . "http://melpa.org/packages/"))
+;; (add-to-list 'package-archives
+;;              '("melpa-stable" . "https://stable.melpa.org/packages/"))
+
+(defun push-to-list (list new-elements)
+  (while new-elements
+    (setq temp (car new-elements))
+    (add-to-list list temp)
+    (setq new-elements (cdr new-elements))
+    ))
+
+(push-to-list 'package-archives
+	(list
+	 '("melpa" . "http://melpa.org/packages/")
+	 '("melpa-stable" . "https://stable.melpa.org/packages/")))
 
 ;; Initialize the package infrastructure
 (package-initialize)
@@ -27,6 +41,9 @@
   '(better-defaults     ; Set up some better Emacs defaults
     material-theme      ; Theme
     zenburn-theme	; Theme    
+
+    use-package		; Isolate package configuration
+    ;; elpy		; Python extension
     ))
 
 ;; Scan the list in myPackages
@@ -52,12 +69,33 @@
 
 ;; Load theme
 (load-theme 'zenburn t)
+
+;;; ===================================
+;;; Development
+;;; ===================================
+
+;; (elpy-enable)
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
+
+(use-package projectile
+  :ensure t
+  :pin melpa-stable
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map
+              ("s-p" . projectile-command-map)
+              ("C-c p" . projectile-command-map)))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages '(zenburn-theme material-theme better-defaults)))
+ '(package-selected-packages
+   '(projectile elpygen zenburn-theme material-theme better-defaults)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
