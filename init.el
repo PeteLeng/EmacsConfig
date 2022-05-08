@@ -11,14 +11,14 @@
 ;; (add-to-list 'package-archives
 ;;              '("melpa-stable" . "https://stable.melpa.org/packages/"))
 
-(defun push-to-list (list new-elements)
+(defun prepend-to-list (list new-elements)
   (while new-elements
     (setq temp (car new-elements))
     (add-to-list list temp)
     (setq new-elements (cdr new-elements))
     ))
 
-(push-to-list 'package-archives
+(prepend-to-list 'package-archives
 	(list
 	 '("melpa" . "http://melpa.org/packages/")
 	 '("melpa-stable" . "https://stable.melpa.org/packages/")))
@@ -28,13 +28,13 @@
 
 ;; If there are no archived package contents, refresh them
 ;; Archived packages are in "/elpa/" folder
-;; (when (not package-archive-contents)
-;;   (package-refresh-contents))
-;; (unless package-archive-contents
-;;   (package-refresh-contents))
+(when (not package-archive-contents)
+  (package-refresh-contents))
+(unless package-archive-contents
+  (package-refresh-contents))
 
 ;; Refresh packages on start up
-(package-refresh-contents)
+;; (package-refresh-contents)
 
 ;; Install packages
 (defvar myPackages	; myPackages contains a list of package names
