@@ -40,7 +40,9 @@
 (defvar myPackages	; myPackages contains a list of package names
   '(better-defaults     ; Set up some better Emacs defaults
     material-theme      ; Theme
-    zenburn-theme	; Theme    
+    zenburn-theme	; Theme
+    monokai-theme
+    spacemacs-theme
 
     use-package		; Isolate package configuration
     ;; elpy		; Python extension
@@ -89,7 +91,7 @@
 ;;; ===================================
 
 ;; Load theme
-(load-theme 'zenburn t)
+(load-theme 'spacemacs-dark t)
 
 ;; Disable tool bar, menu bar, and scroll bar
 (tool-bar-mode 0)
@@ -104,15 +106,21 @@
 (setq w32-lwindow-modifier 'super)
 (w32-register-hot-key [s-])
 
-;; Remap keys for skipping paragraphs
+;; Skip paragraphs
 (global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "M-n") 'forward-paragraph)
 
-;; Remap keys for windows resizing
+;; Resize windows
 (global-set-key (kbd "s-<left>") 'shrink-window-horizontally)
 (global-set-key (kbd "s-<right>") 'enlarge-window-horizontally)
 (global-set-key (kbd "s-<up>") 'shrink-window)
 (global-set-key (kbd "s-<down>") 'enlarge-window)
+
+;; Comment line
+(global-set-key (kbd "C-;") 'comment-line)
+
+;; Evaluate expression
+(global-set-key (kbd "C-.") 'eval-last-sexp)
 
 ;;; ===================================
 ;;; Vertico completion UI
@@ -268,7 +276,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-)
+ '(fixed-pitch ((t (:family "Consolas" :height 180))))
+ '(org-level-1 ((t (:height 1.25 :weight bold))))
+ '(org-level-2 ((t (:weight bold))))
+ '(org-level-3 ((t (:weight bold)))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
