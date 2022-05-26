@@ -62,7 +62,6 @@
 
 (setq inhibit-startup-message t)					; Hide the startup message
 (setq-default line-spacing 1)						; Set line space
-;; (set-face-attribute 'default nil :family "Source Code Pro" :height 180)	; Set global buffer font
 
 ;; Minor mode
 (global-linum-mode 0)							; Enable line numbers globally
@@ -76,11 +75,8 @@
 
 (custom-theme-set-faces
  'user
- ;; '(variable-pitch ((t (:family "Arial" :height 180))))
- `(fixed-pitch ((t (:family "Consolas" :height 180)))))
-
-(set-face-font 'default "Source Code Pro-18") ; set fixed-width font
-;; (set-face-font 'variable-pitch "TeX Gyre Pagella-18") ; set variable-width font
+ '(variable-pitch ((t (:family "Arial" :height 180))))
+ '(fixed-pitch ((t (:family "Consolas" :height 180)))))
 
 ;; (use-package mixed-pitch ; set org mode to use variable width font smartly
 ;;   :ensure t
@@ -91,7 +87,7 @@
 ;;; ===================================
 
 ;; Load theme
-(load-theme 'spacemacs-dark t)
+(load-theme 'zenburn t)
 
 ;; Disable tool bar, menu bar, and scroll bar
 (tool-bar-mode 0)
@@ -106,9 +102,17 @@
 (setq w32-lwindow-modifier 'super)
 (w32-register-hot-key [s-])
 
-;; Skip paragraphs
-(global-set-key (kbd "M-p") 'backward-paragraph)
-(global-set-key (kbd "M-n") 'forward-paragraph)
+;; Navigate paragraphs
+(global-set-key (kbd "C-<") 'backward-paragraph)
+(global-set-key (kbd "C->") 'forward-paragraph)
+
+;; Navigate sentences
+(global-set-key (kbd "M-p") 'backward-sentence)
+(global-set-key (kbd "M-n") 'forward-sentence)
+
+;; Navigate balanced expressions
+(global-set-key (kbd "M-a") 'backward-sexp)
+(global-set-key (kbd "M-e") 'forward-sexp)
 
 ;; Resize windows
 (global-set-key (kbd "s-<left>") 'shrink-window-horizontally)
@@ -121,6 +125,12 @@
 
 ;; Evaluate expression
 (global-set-key (kbd "C-.") 'eval-last-sexp)
+
+;; Undo
+(global-set-key (kbd "C-z") 'undo)
+
+;; Suspend-frame
+(global-set-key (kbd "C-<tab>") 'suspend-frame)
 
 ;;; ===================================
 ;;; Vertico completion UI
@@ -217,16 +227,18 @@
   )
 
 ;; Increase header font size and weight
-(custom-theme-set-faces
- 'user
- `(org-level-1 ((t (:height 1.25 :weight bold))))
- `(org-level-2 ((t (:weight bold))))
- `(org-level-3 ((t (:weight bold)))))
+ ;; (custom-theme-set-faces
+ ;; 'user
+ ;; `(org-level-1 ((t (:height 1.25 :weight bold))))
+ ;; `(org-level-2 ((t (:weight bold))))
+ ;; `(org-level-3 ((t (:weight bold)))))
 
 ;; Key mapping
 (global-set-key (kbd "C-c l") #'org-store-link)
 (global-set-key (kbd "C-c a") #'org-agenda)
 (global-set-key (kbd "C-c c") #'org-capture)
+(global-set-key (kbd "M-<") 'org-backward-element)
+(global-set-key (kbd "M->") 'org-forward-element)
 
 ;; Minor mode for Org
 ;; (setq org-startup-indented t)
@@ -277,9 +289,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(fixed-pitch ((t (:family "Consolas" :height 180))))
- '(org-level-1 ((t (:height 1.25 :weight bold))))
- '(org-level-2 ((t (:weight bold))))
- '(org-level-3 ((t (:weight bold)))))
+  )
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
