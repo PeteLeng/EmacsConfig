@@ -64,10 +64,16 @@
 (setq-default line-spacing 1)						; Set line space
 
 ;; Minor mode
-(global-linum-mode 0)							; Enable line numbers globally
-;; (set-face-attribute 'linum nil :height 100)				; Fix line numers height
+(global-linum-mode 0) ; Enable line numbers globally
 (global-display-line-numbers-mode)
 (electric-pair-mode 1)
+
+;; Encoding style
+(prefer-coding-system       'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
 
 ;;; ===================================
 ;;; Font
@@ -75,8 +81,24 @@
 
 (custom-theme-set-faces
  'user
- '(variable-pitch ((t (:family "Arial" :height 180))))
- '(fixed-pitch ((t (:family "Consolas" :height 180)))))
+ '(default ((t (:family "CaskaydiaCove Nerd Font" :height 180))))
+ '(variable-pitch ((t (:family "Lucida Sans Unicode" :height 180))))
+ '(fixed-pitch ((t (:family "CaskaydiaCove Nerd Font" :height 180)))))
+
+;; (custom-theme-set-faces
+;;    'user
+;;    '(org-block ((t (:inherit fixed-pitch))))
+;;    '(org-code ((t (:inherit (shadow fixed-pitch)))))
+;;    '(org-document-info ((t (:foreground "dark orange"))))
+;;    '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+;;    '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+;;    '(org-link ((t (:foreground "royal blue" :underline t))))
+;;    '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;;    '(org-property-value ((t (:inherit fixed-pitch))) t)
+;;    '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;;    '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+;;    '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+;;    '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
 
 ;; (use-package mixed-pitch ; set org mode to use variable width font smartly
 ;;   :ensure t
@@ -107,12 +129,12 @@
 (global-set-key (kbd "C->") 'forward-paragraph)
 
 ;; Navigate sentences
-(global-set-key (kbd "M-p") 'backward-sentence)
-(global-set-key (kbd "M-n") 'forward-sentence)
+;; (global-set-key (kbd "M-p") 'backward-sentence)
+;; (global-set-key (kbd "M-n") 'forward-sentence)
 
 ;; Navigate balanced expressions
-(global-set-key (kbd "M-a") 'backward-sexp)
-(global-set-key (kbd "M-e") 'forward-sexp)
+;; (global-set-key (kbd "M-a") 'backward-sexp)
+;; (global-set-key (kbd "M-e") 'forward-sexp)
 
 ;; Resize windows
 (global-set-key (kbd "s-<left>") 'shrink-window-horizontally)
@@ -124,7 +146,7 @@
 (global-set-key (kbd "C-;") 'comment-line)
 
 ;; Evaluate expression
-(global-set-key (kbd "C-.") 'eval-last-sexp)
+(global-set-key (kbd "C-=") 'eval-last-sexp)
 
 ;; Undo
 (global-set-key (kbd "C-z") 'undo)
@@ -215,12 +237,46 @@
 ;;; Org
 ;;; ===================================
 
-;; Markup settings
-(setq org-hide-emphasis-markers t)
+(use-package org
+  :init
+  ;; (org-mode)
+  :config
+  (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "❂")
+					 ("#+END_SRC" . "❂")
+					 ("#+begin_src" . "❂")
+					 ("#+end_src" . "❂")
+					 (">=" . "≥")
+					 ("=>" . "⇨")))
+  (setq org-hide-emphasis-markers t
+	org-fontify-done-headline t
+	org-hide-leading-stars t
+	org-pretty-entities t
+	;; org-odd-levels-only t
+	prettify-symbols-unprettify-at-point 'right-edge
+	org-format-latex-options (plist-put org-format-latex-options :scale 2.0)
+	)
+  (add-hook 'org-mode-hook #'(lambda ()
+                               (visual-line-mode)
+                               (org-indent-mode)
+			       (prettify-symbols-mode)
+			       ;; (variable-pitch-mode)
+			       ))	
+  ;; (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
+  ;; (setq org-indent-mode-turns-off-org-adapt-indentation nil)
+  :bind (("C-c l" . org-store-link)
+	 ("C-c a" . org-agenda)
+	 ("C-c c" . org-capture)
+	 ("M-<" . org-backward-element)
+	 ("M->" . org-forward-element)
+	 ))
 
-;; Hide asterisks in headers
 (use-package org-bullets
+  ;; :disabled t
   :ensure t
+  :custom
+  (org-bullets-bullet-list '("✙" "♱" "♰" "✞" "✟" "✝" "†" "✠" "✚" "✜" "✛" "✢" "✣" "✤" "✥"))  
+  (org-ellipsis "⤵")
+  ;; :hook (org-mode . org-bullets-mode)
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   ;; (setq org-bullets-bullet-list '("\u200b"))
@@ -233,22 +289,6 @@
  ;; `(org-level-2 ((t (:weight bold))))
  ;; `(org-level-3 ((t (:weight bold)))))
 
-;; Key mapping
-(global-set-key (kbd "C-c l") #'org-store-link)
-(global-set-key (kbd "C-c a") #'org-agenda)
-(global-set-key (kbd "C-c c") #'org-capture)
-(global-set-key (kbd "M-<") 'org-backward-element)
-(global-set-key (kbd "M->") 'org-forward-element)
-
-;; Minor mode for Org
-;; (setq org-startup-indented t)
-(add-hook 'org-mode-hook #'(lambda ()
-                             (visual-line-mode)		; Line continuation
-                             (org-indent-mode)))	; Cleaner outline view
-
-;; (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
-;; (setq org-indent-mode-turns-off-org-adapt-indentation nil)
-
 ;;; ===================================
 ;;; Org-roam
 ;;; ===================================
@@ -259,28 +299,28 @@
 (use-package org-roam
   :ensure t
   :after org
-  :init (setq org-roam-v2-ack t) ;; Acknowledge V2 upgrade
-  :custom
-  (org-roam-directory (file-truename org-directory))
+  :init
+  (setq org-roam-v2-ack t) ;; Acknowledge V2 upgrade
+  :custom (org-roam-directory (file-truename org-directory))
   :config
-  (org-roam-setup)
-  :bind (("C-c n f" . org-roam-node-find)
-	 ("C-c n r" . org-roam-node-random)
-	 (:map org-mode-map
-	       (("C-c n i" . org-roam-node-insert)
-		("C-c n o" . org-id-get-create)
-		("C-c n t" . org-roam-tag-add)
-		("C-c n a" . org-roam-alias-add)
-		("C-c n l" . org-roam-buffer-toggle)))))
-		
-;;; ===================================
-;;; Latex
-;;; ===================================
-
-(with-eval-after-load 'org
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+  ;; (org-roam-setup) ; This function is obsolete.
+  (org-roam-db-autosync-enable)
+  :bind
+  (("C-c n f" . org-roam-node-find)
+   ("C-c n r" . org-roam-node-random)
+   ;; (:map org-mode-map
+   ;; 	 (("C-c n i" . org-roam-node-insert)
+   ;; 	  ("C-c n o" . org-id-get-create)
+   ;; 	  ("C-c n t" . org-roam-tag-add)
+   ;; 	  ("C-c n a" . org-roam-alias-add)
+   ;; 	  ("C-c n l" . org-roam-buffer-toggle))))
+   :map org-mode-map
+   ("C-c n i" . org-roam-node-insert)
+   ("C-c n o" . org-id-get-create)
+   ("C-c n t" . org-roam-tag-add)
+   ("C-c n a" . org-roam-alias-add)
+   ("C-c n l" . org-roam-buffer-toggle))
   )
-;; (set-default 'preview-scale-function 1.2)
 
 ;; This is the end of user configuration
 (custom-set-faces
@@ -289,7 +329,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(fixed-pitch ((t (:family "Consolas" :height 180))))
-  )
+ '(variable-pitch ((t (:family "Arial" :height 180)))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
