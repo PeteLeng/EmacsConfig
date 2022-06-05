@@ -79,11 +79,39 @@
 ;;; Font
 ;;; ===================================
 
-(custom-theme-set-faces
- 'user
- '(default ((t (:family "CaskaydiaCove Nerd Font" :height 180))))
- '(variable-pitch ((t (:family "Lucida Sans Unicode" :height 180))))
- '(fixed-pitch ((t (:family "CaskaydiaCove Nerd Font" :height 180)))))
+(set-face-attribute 'default nil
+		    :family "DejaVu Sans Mono"
+		    :height 170
+		    :width 'expanded
+		    )
+
+(set-fontset-font
+ t
+ 'symbol
+ (cond
+  ((string-equal system-type "windows-nt")
+   (cond
+    ;; ((member "Symbola" (font-family-list)) "Symbola")
+    ((member "Segoe UI Symbol" (font-family-list)) "Segoe UI Symbol")))
+  ((string-equal system-type "gnu/linux")
+   (cond
+    ((member "Symbola" (font-family-list)) "Symbola")))
+  ))
+
+(set-fontset-font
+ t
+ (if (version< emacs-version "28.1")
+     '(#x1f300 . #x1fad0)
+   'emoji)
+ (cond
+  ((member "Noto Emoji" (font-family-list)) "Noto Emoji")
+  ))
+
+;; (custom-theme-set-faces
+;;  'user
+;;  '(default ((t (:family "CaskaydiaCove Nerd Font" :height 180))))
+;;  '(variable-pitch ((t (:family "Lucida Sans Unicode" :height 180))))
+;;  '(fixed-pitch ((t (:family "CaskaydiaCove Nerd Font" :height 180)))))
 
 ;; (custom-theme-set-faces
 ;;    'user
@@ -100,16 +128,13 @@
 ;;    '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
 ;;    '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
 
-;; (use-package mixed-pitch ; set org mode to use variable width font smartly
-;;   :ensure t
-;;   :hook (text-mode . mixed-pitch-mode))
-
 ;;; ===================================
 ;;; Cleaner UI
 ;;; ===================================
 
 ;; Load theme
 (load-theme 'zenburn t)
+;; (load-theme 'spacemacs-dark t)
 
 ;; Disable tool bar, menu bar, and scroll bar
 (tool-bar-mode 0)
@@ -120,9 +145,12 @@
 ;;; Key bindings
 ;;; ===================================
 
-(w32-register-hot-key [M-tab])
+;; (w32-register-hot-key [M-tab])
 (setq w32-lwindow-modifier 'super)
 (w32-register-hot-key [s-])
+
+;; Completion
+(global-set-key (kbd "C-<tab>") 'completion-at-point)
 
 ;; Navigate paragraphs
 (global-set-key (kbd "C-<") 'backward-paragraph)
@@ -152,7 +180,7 @@
 (global-set-key (kbd "C-z") 'undo)
 
 ;; Suspend-frame
-(global-set-key (kbd "C-<tab>") 'suspend-frame)
+;; (global-set-key (kbd "C-<tab>") 'suspend-frame)
 
 ;;; ===================================
 ;;; Vertico completion UI
@@ -215,7 +243,19 @@
 ;;; Python development
 ;;; ===================================
 
-;; (elpy-enable)
+;; (setq anaconda-dir (concat (getenv "HOMEPATH") "\\anaconda3\\"))
+
+(use-package conda
+  :disabled t
+  :ensure nil
+  :init
+  (setq conda-anaconda-home (expand-file-name "~/anaconda3"))
+  (setq conda-env-home-directory (expand-file-name "~/anaconda3"))
+  ;; (conda-env-initialize-interactive-shells)
+  )
+
+;; (setenv "WORKON_HOME" "~/anaconda3/envs")
+
 (use-package elpy
   :ensure t
   :init
@@ -294,7 +334,7 @@
 ;;; ===================================
 
 ;; Org-Roam basic configuration
-(setq org-directory (concat (getenv "HOMEPATH") "\\Vorg\\"))
+(setq org-directory (concat (getenv "HOME") "\\Vorg\\"))
 
 (use-package org-roam
   :ensure t
@@ -328,8 +368,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(fixed-pitch ((t (:family "Consolas" :height 180))))
- '(variable-pitch ((t (:family "Arial" :height 180)))))
+ )
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
