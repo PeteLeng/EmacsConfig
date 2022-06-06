@@ -69,6 +69,7 @@
 (electric-pair-mode 1)
 
 ;; Encoding style
+(set-language-environment 'utf-8)
 (prefer-coding-system       'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
@@ -81,9 +82,20 @@
 
 (set-face-attribute 'default nil
 		    :family "DejaVu Sans Mono"
-		    :height 170
-		    :width 'expanded
+		    :height 180
 		    )
+
+(set-fontset-font
+ t
+ 'han
+ (cond
+  ((string-equal system-type "windows-nt")
+   (cond
+    ((member "Noto Sans Mono CJK SC" (font-family-list)) "Noto Sans Mono CJK SC")))
+  ((string-equal system-type "gnu/linux")
+   (cond
+    ((member "Noto Sans Mono CJK SC" (font-family-list)) "Noto Sans Mono CJK SC")))
+  ))
 
 (set-fontset-font
  t
@@ -91,6 +103,7 @@
  (cond
   ((string-equal system-type "windows-nt")
    (cond
+    ;; ((member "Noto Sans Symbols" (font-family-list)) "Noto Sans Symbols")
     ;; ((member "Symbola" (font-family-list)) "Symbola")
     ((member "Segoe UI Symbol" (font-family-list)) "Segoe UI Symbol")))
   ((string-equal system-type "gnu/linux")
@@ -281,12 +294,13 @@
   :init
   ;; (org-mode)
   :config
-  (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "❂")
-					 ("#+END_SRC" . "❂")
-					 ("#+begin_src" . "❂")
-					 ("#+end_src" . "❂")
-					 (">=" . "≥")
-					 ("=>" . "⇨")))
+  (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "☩")
+					 ("#+END_SRC" . "☩")
+					 ("#+begin_src" . "☩")
+					 ("#+end_src" . "☩")
+					 ;; (">=" . "≥")
+					 ;; ("=>" . "⇨"))
+					 )
   (setq org-hide-emphasis-markers t
 	org-fontify-done-headline t
 	org-hide-leading-stars t
@@ -314,7 +328,8 @@
   ;; :disabled t
   :ensure t
   :custom
-  (org-bullets-bullet-list '("✙" "♱" "♰" "✞" "✟" "✝" "†" "✠" "✚" "✜" "✛" "✢" "✣" "✤" "✥"))  
+  ;; (org-bullets-bullet-list '("✙" "♱" "♰" "✞" "✟" "✝" "†" "✠" "✚" "✜" "✛" "✢" "✣" "✤" "✥"))
+  (org-bullets-bullet-list '("♱" "☦" "†" "✝" "✞" "✟" "✠" "✜" "✛" "✙" "✚"))
   (org-ellipsis "⤵")
   ;; :hook (org-mode . org-bullets-mode)
   :config
