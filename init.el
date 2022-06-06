@@ -299,8 +299,8 @@
 					 ("#+begin_src" . "☩")
 					 ("#+end_src" . "☩")
 					 ;; (">=" . "≥")
-					 ;; ("=>" . "⇨"))
-					 )
+					 ;; ("=>" . "⇨")
+					 ))
   (setq org-hide-emphasis-markers t
 	org-fontify-done-headline t
 	org-hide-leading-stars t
