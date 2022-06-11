@@ -1,4 +1,6 @@
-;;; ===================================
+;; -*- lexical-binding: t; -*-
+
+;;; ===================================  
 ;;; Melpa Package Support
 ;;; ===================================
 
@@ -20,7 +22,7 @@
 ;; Install packages
 (defvar myPackages	; myPackages contains a list of package names
   '(better-defaults     ; Set up some better Emacs defaults
-    zenburn-theme	; Theme
+    ;; zenburn-theme	; Theme
     use-package		; Isolate package configuration
     ))
 
@@ -104,58 +106,107 @@
 ;; org-code face inherits from fixed-pitch face
 ;; adjust fix-pitch face so that org inline code is conspicuous
 (set-face-attribute 'fixed-pitch nil
-		    :family "Fantasque Sans Mono"
+		    :family "Consolas"
 		    :height 180
 		    ;; :foreground "cadet blue"
 		    )
 
-(set-fontset-font
- t
- 'han
- (cond
-  ((string-equal system-type "windows-nt")
+(defun custom-set-fontset()
+  (set-fontset-font
+   t
+   'han
    (cond
-    ((member "Noto Sans Mono CJK SC" (font-family-list)) "Noto Sans Mono CJK SC")))
-  ((string-equal system-type "gnu/linux")
-   (cond
-    ((member "Noto Sans Mono CJK SC" (font-family-list)) "Noto Sans Mono CJK SC")))
-  ))
+    ((string-equal system-type "windows-nt")
+     (cond
+      ((member "Noto Sans Mono CJK SC" (font-family-list)) "Noto Sans Mono CJK SC")))
+    ((string-equal system-type "gnu/linux")
+     (cond
+      ((member "Noto Sans Mono CJK SC" (font-family-list)) "Noto Sans Mono CJK SC")))
+    ))
 
-(set-fontset-font
- t
- 'symbol
- (cond
-  ((string-equal system-type "windows-nt")
+  (set-fontset-font
+   t
+   'symbol
    (cond
-    ;; ((member "Noto Sans Symbols" (font-family-list)) "Noto Sans Symbols")
-    ;; ((member "Symbola" (font-family-list)) "Symbola")
-    ((member "Segoe UI Symbol" (font-family-list)) "Segoe UI Symbol")))
-  ((string-equal system-type "gnu/linux")
-   (cond
-    ((member "Symbola" (font-family-list)) "Symbola")))
-  ))
+    ((string-equal system-type "windows-nt")
+     (cond
+      ;; ((member "Noto Sans Symbols" (font-family-list)) "Noto Sans Symbols")
+      ;; ((member "Symbola" (font-family-list)) "Symbola")
+      ((member "Segoe UI Symbol" (font-family-list)) "Segoe UI Symbol")))
+    ((string-equal system-type "gnu/linux")
+     (cond
+      ((member "Symbola" (font-family-list)) "Symbola")))
+    ))
 
-(set-fontset-font
- t
- (if (version< emacs-version "28.1")
-     '(#x1f300 . #x1fad0)
-   'emoji)
- (cond
-  ((member "Noto Emoji" (font-family-list)) "Noto Emoji")
-  ))
+  (set-fontset-font
+   t
+   (if (version< emacs-version "28.1")
+       '(#x1f300 . #x1fad0)
+     'emoji)
+   (cond
+    ((member "Noto Emoji" (font-family-list)) "Noto Emoji")
+    ))
+  )
+
+(if (daemonp)
+    (add-hook 'after-make-frame-functions
+	      (lambda (frame)
+		(with-selected-frame frame (custom-set-fontset))))
+  (custom-set-fontset))
 
 ;;; ===================================
 ;;; Cleaner UI
 ;;; ===================================
 
+(defun current-hour ()
+  (let ((time (current-time-string)))
+    (setq time-list (split-string (current-time-string)))
+    (setq time-of-day (nth 3 time-list))
+    (setq time-of-day-list (split-string time-of-day ":"))
+    (string-to-number (nth 0 time-of-day-list))
+    ))
+
+(defun day-or-night (hour)
+  (if (or (>= hour 18)
+	  (<= hour 7))
+      nil
+    t)
+  )
+
 ;; Load theme
-(load-theme 'zenburn t)
-;; (load-theme 'spacemacs-dark t)
+(if (day-or-night (current-hour))
+    (load-theme 'whiteboard t)
+  (load-theme 'whiteboard t)
+    )
 
 ;; Disable tool bar, menu bar, and scroll bar
 (tool-bar-mode 0)
 (menu-bar-mode 0)
 (set-scroll-bar-mode nil)
+
+;; Doomemacs theme megapack
+(use-package doom-themes
+  :disabled t
+  ;; :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+
+  (if (day-or-night (current-hour))
+      (load-theme 'doom-one-light t)
+    (load-theme 'doom-vibrant t)
+      )
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  ;; (doom-themes-neotree-config)
+  ;; or for treemacs users
+  ;; (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  ;; (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 
 ;;; ===================================
 ;;; Vertico completion UI
@@ -164,6 +215,7 @@
 ;; Enable vertico
 (use-package vertico
   :ensure t
+  :pin melpa-stable
   :init
   (vertico-mode)
 
@@ -214,6 +266,16 @@
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t))
 
+(use-package orderless
+  :ensure t
+  :init
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
+  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
+
 ;;; ===================================
 ;;; Python development
 ;;; ===================================
@@ -232,6 +294,7 @@
 
 (use-package elpy
   :ensure t
+  :pin melpa-stable
   :init
   (elpy-enable)
   :config
@@ -247,10 +310,16 @@
   :init
   ;; (org-mode)
   :config
-  (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "☩")
-					 ("#+END_SRC" . "☩")
-					 ("#+begin_src" . "☩")
-					 ("#+end_src" . "☩")
+  (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "❮")
+					 ("#+END_SRC" . "❯")
+					 ("#+begin_src" . "❮")
+					 ("#+end_src" . "❯")
+					 ;; ("#+begin_quote" . "❝")
+					 ;; ("#+end_quote" . "❞")
+					 ("#+begin_quote" . "“")
+					 ("#+end_quote" . "”")
+					 ("#+begin_verse" . "“")
+					 ("#+end_verse" . "”")
 					 ;; (">=" . "≥")
 					 ;; ("=>" . "⇨")
 					 ))
@@ -260,7 +329,11 @@
 	org-pretty-entities t
 	;; org-odd-levels-only t
 	prettify-symbols-unprettify-at-point 'right-edge
-	org-format-latex-options (plist-put org-format-latex-options :scale 1.75)
+	org-image-actual-width nil ; Allow for resizing pictures using captions
+	)
+  ;; LaTeX options
+  (setq org-preview-latex-default-process 'dvisvgm
+	org-format-latex-options (plist-put org-format-latex-options :scale 2.0)
 	)
   (add-hook 'org-mode-hook #'(lambda ()
                                (visual-line-mode)
@@ -290,6 +363,22 @@
   ;; (setq org-bullets-bullet-list '("\u200b"))
   )
 
+;; Set background color for org code blocks
+(require 'color)
+(setq code-block-bg-color (color-darken-name (face-attribute 'default :background) 8))
+;; (set-face-attribute 'org-block nil
+;;                     :background (color-darken-name (face-attribute 'default :background) 5)
+;;                     )
+
+;; (custom-set-faces
+;;  `(org-block-begin-line
+;;    ((t (:background ,code-block-bg-color :extend t))))
+;;  `(org-block
+;;    ((t (:background ,code-block-bg-color :extend t))))
+;;  `(org-block-end-line
+;;    ((t (:background ,code-block-bg-color :extend t))))
+;;  )
+
 ;;; ===================================
 ;;; Org-roam
 ;;; ===================================
@@ -317,11 +406,17 @@
    ;; 	  ("C-c n l" . org-roam-buffer-toggle))))
    :map org-mode-map
    ("C-c n i" . org-roam-node-insert)
-   ("C-c n o" . org-id-get-create)
+   ("C-c n p" . org-id-get-create)
    ("C-c n t" . org-roam-tag-add)
    ("C-c n a" . org-roam-alias-add)
-   ("C-c n l" . org-roam-buffer-toggle))
+   ("C-c n b" . org-roam-buffer-toggle))
   )
+
+;;; ===================================
+;;; Custom functions
+;;; ===================================
+
+(load "~/.emacs.d/lisp/greetings.el")
 
 ;;; This is the end of user configuration
 (custom-set-variables
